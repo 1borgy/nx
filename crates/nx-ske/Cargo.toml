@@ -1,0 +1,11 @@
+[package]
+name = "nx-ske"
+version = "0.0.1"
+edition = { workspace = true }
+
+[dependencies]
+nx-common = { workspace = true }
+
+byteorder = { workspace = true }
+log = { workspace = true }
+thiserror = { workspace = true }

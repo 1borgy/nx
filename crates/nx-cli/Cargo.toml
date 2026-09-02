@@ -1,0 +1,16 @@
+[package]
+name = "nx-cli"
+version = "0.0.1"
+edition = { workspace = true }
+
+[[bin]]
+name = "nx-cli"
+path = "src/main.rs"
+
+[dependencies]
+nx-ske = { workspace = true }
+
+clap = { workspace = true }
+color-eyre = { workspace = true }
+env_logger = { workspace = true }
+log = { workspace = true }

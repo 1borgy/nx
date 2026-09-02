@@ -1,0 +1,21 @@
+[workspace]
+members = ["crates/*"]
+resolver = "2"
+
+[workspace.package]
+edition = "2024"
+repository = "https://github.com/1borgy/nx-tools"
+license = "MIT"
+
+[workspace.dependencies]
+nx-cli = { path = "crates/nx-cli" }
+nx-common = { path = "crates/nx-common" }
+nx-ske = { path = "crates/nx-ske" }
+nx-test = { path = "crates/nx-test" }
+
+byteorder = "1"
+clap = { version = "4", features = ["derive"] }
+color-eyre = "0.6"
+env_logger = "0.11"
+log = "0.4"
+thiserror = "2"
