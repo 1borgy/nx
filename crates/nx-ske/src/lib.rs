@@ -1,7 +1,7 @@
 use std::{fmt::Display, io};
 
 use byteorder::{LE, ReadBytesExt};
-use nx_common::{Readable, Writable};
+use nx_common::{Reader, Writer};
 use thiserror::Error;
 
 mod common;
@@ -64,7 +64,7 @@ pub enum Skeleton {
 }
 
 impl Skeleton {
-    pub fn read(reader: &mut impl Readable) -> Result<Self, Error> {
+    pub fn read(reader: &mut impl Reader) -> Result<Self, Error> {
         let version = Version::try_from(reader.read_u16::<LE>()?)?;
         reader.seek(io::SeekFrom::Start(0))?;
 

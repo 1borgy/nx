@@ -17,5 +17,6 @@ byteorder = "1"
 clap = { version = "4", features = ["derive"] }
 color-eyre = "0.6"
 env_logger = "0.11"
+itertools = "0.15"
 log = "0.4"
 thiserror = "2"

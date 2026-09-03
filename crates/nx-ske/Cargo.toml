@@ -7,5 +7,6 @@ edition = { workspace = true }
 nx-common = { workspace = true }
 
 byteorder = { workspace = true }
+itertools = { workspace = true }
 log = { workspace = true }
 thiserror = { workspace = true }
