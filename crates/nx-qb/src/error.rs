@@ -1,0 +1,32 @@
+use std::{fmt::Debug, io, result};
+
+use crate::component::Value;
+
+#[derive(thiserror::Error, Debug, Clone)]
+pub enum Error {
+    #[error("io error: {0}")]
+    Io(io::ErrorKind),
+
+    #[error("invalid component type {0}")]
+    InvalidComponentType(u8),
+
+    #[error("internal error: {0} is not implemented")]
+    NotImplemented(String),
+
+    #[error("both checksum table lookup bits set in symbol type byte: {0:#02x}")]
+    BothChecksumBits(u8),
+
+    #[error("expected value type {0}, got {1}")]
+    ExpectedValueType(String, Value),
+
+    #[error("invalid token type {0}")]
+    InvalidTokenType(u8),
+}
+
+impl From<io::Error> for Error {
+    fn from(value: io::Error) -> Self {
+        Self::Io(value.kind())
+    }
+}
+
+pub type Result<T, E = Error> = result::Result<T, E>;

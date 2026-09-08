@@ -1,8 +1,15 @@
-use std::{fs, io::BufReader, path::PathBuf};
+use std::fmt::Debug;
 
 use clap::Parser;
 
-#[derive(Debug, Parser)]
+mod anim;
+mod common;
+mod crc;
+mod qb;
+mod skel;
+mod stdkey;
+
+#[derive(Debug, clap::Parser)]
 #[command(version, about, long_about = None)]
 struct App {
     #[clap(subcommand)]
@@ -11,10 +18,27 @@ struct App {
 
 #[derive(Debug, clap::Subcommand)]
 enum Command {
-    Ske {
-        #[arg(short, long)]
-        input: PathBuf,
+    Skel {
+        #[clap(subcommand)]
+        command: skel::Command,
     },
+    Anim {
+        #[clap(subcommand)]
+        command: anim::Command,
+    },
+    Crc {
+        #[clap(subcommand)]
+        command: crc::Command,
+    },
+    StdKey {
+        #[clap(subcommand)]
+        command: stdkey::Command,
+    },
+    Qb {
+        #[clap(subcommand)]
+        command: qb::Command,
+    },
+    Test,
 }
 
 fn main() -> color_eyre::Result<()> {
@@ -23,12 +47,14 @@ fn main() -> color_eyre::Result<()> {
     env_logger::init();
 
     match command {
-        Command::Ske { input } => {
-            let input_file = fs::File::open(input)?;
-            let mut input_reader = BufReader::new(input_file);
-            nx_ske::Skeleton::read(&mut input_reader)?;
+        Command::Skel { command } => skel::main(command),
+        Command::Anim { command } => anim::main(command),
+        Command::StdKey { command } => stdkey::main(command),
+        Command::Qb { command } => qb::main(command),
+        Command::Test => {
+            println!("{:08x}", 872384015);
+            Ok(())
         }
+        Command::Crc { command } => crc::main(command),
     }
-
-    Ok(())
 }

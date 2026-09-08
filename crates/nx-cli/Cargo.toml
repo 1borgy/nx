@@ -1,6 +1,6 @@
 [package]
 name = "nx-cli"
-version = "0.0.1"
+version = { workspace = true }
 edition = { workspace = true }
 
 [[bin]]
@@ -8,9 +8,16 @@ name = "nx-cli"
 path = "src/main.rs"
 
 [dependencies]
-nx-ske = { workspace = true }
+nx-anim = { workspace = true, features = ["serde"] }
+nx-common = { workspace = true, features = ["clap", "serde"] }
+nx-crc = { workspace = true }
+nx-qb = { workspace = true, features = ["serde"] }
+nx-stdkey = { workspace = true, features = ["serde"] }
+nx-skel = { workspace = true, features = ["serde"] }
 
 clap = { workspace = true }
 color-eyre = { workspace = true }
 env_logger = { workspace = true }
 log = { workspace = true }
+ron = { workspace = true }
+serde = { workspace = true }

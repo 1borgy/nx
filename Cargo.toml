@@ -3,20 +3,33 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.package]
+version = "0.0.1-dev.1"
 edition = "2024"
 repository = "https://github.com/1borgy/nx-tools"
 license = "MIT"
 
 [workspace.dependencies]
+nx-anim = { path = "crates/nx-anim" }
 nx-cli = { path = "crates/nx-cli" }
+nx-crc = { path = "crates/nx-crc" }
 nx-common = { path = "crates/nx-common" }
-nx-ske = { path = "crates/nx-ske" }
+nx-qb = { path = "crates/nx-qb" }
+nx-stdkey = { path = "crates/nx-stdkey" }
+nx-skel = { path = "crates/nx-skel" }
 nx-test = { path = "crates/nx-test" }
 
+anyhow = "1"
+bitflags = "2"
 byteorder = "1"
 clap = { version = "4", features = ["derive"] }
 color-eyre = "0.6"
+crc = "3.0.1"
+encoding_rs = "0.8"
 env_logger = "0.11"
 itertools = "0.15"
 log = "0.4"
+ron = "0.12"
+serde = { version = "1", features = ["derive"] }
 thiserror = "2"
+tokio = { version = "1.40.0", features = ["fs", "io-util"] }
+walkdir = "2"

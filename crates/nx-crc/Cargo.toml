@@ -1,0 +1,7 @@
+[package]
+name = "nx-crc"
+version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
+crc = { workspace = true }

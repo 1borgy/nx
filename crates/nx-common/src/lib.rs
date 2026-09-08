@@ -1,20 +1,7 @@
-use std::io::{self, Read, Seek, Write};
+mod game;
+mod io;
+mod vec4;
 
-pub trait Reader: Read + Seek {}
-pub trait Writer: Write + Seek {}
-
-impl<T> Reader for T where T: Read + Seek {}
-impl<T> Writer for T where T: Write + Seek {}
-
-pub trait Readable
-where
-    Self: Sized,
-{
-    type Error;
-    fn read(reader: &mut impl Reader) -> Result<Self, Self::Error>;
-}
-
-pub trait Writeable {
-    type Error;
-    fn read(&self, writer: &mut impl Writer) -> Result<(), Self::Error>;
-}
+pub use game::Game;
+pub use io::{Readable, Reader, Writable, Writer};
+pub use vec4::Vec4;

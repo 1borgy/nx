@@ -1,0 +1,14 @@
+[package]
+name = "nx_blender"
+version = { workspace = true }
+edition = { workspace = true }
+
+[lib]
+name = "nx_blender"
+crate-type = ["cdylib"]
+
+[dependencies]
+nx-qb = { workspace = true }
+nx-common = { workspace = true }
+
+pyo3 = { version = "0.19", features = ["extension-module", "abi3-py37"] }

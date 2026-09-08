@@ -1,0 +1,12 @@
+[package]
+name = "nx-test"
+version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
+nx-common = { workspace = true }
+
+anyhow = { workspace = true }
+log = { workspace = true }
+tokio = { workspace = true, features = ["rt"] }
+walkdir = { workspace = true }
