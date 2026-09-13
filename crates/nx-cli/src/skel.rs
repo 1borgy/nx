@@ -43,12 +43,12 @@ fn diff(
     // log::info!("src={:?}", src);
     // log::info!("dst={:?}", dst);
 
-    let mapping = match (src_game, dst_game) {
-        (nx_common::Game::THUG, nx_common::Game::THPS4) => {
-            nx_skel::mappings::thug1_to_thps4::MAPPING
-        }
-        _ => todo!(),
-    };
+    // let mapping = match (src_game, dst_game) {
+    //     (nx_common::Game::THUG, nx_common::Game::THPS4) => {
+    //         nx_skel::mappings::thug1_to_thps4::MAPPING
+    //     }
+    //     _ => todo!(),
+    // };
 
     let thps4_stomach = dst.get_index(2).unwrap();
     log::info!(
@@ -74,28 +74,28 @@ fn diff(
     // let thug_stomach_chest = src.get_index(4).unwrap();
     // let thug_neck = src.get_index(29).unwrap();
 
-    for (dst_index, src_index) in mapping.iter() {
-        let src_bone = match src.get_index(*src_index) {
-            Some(bone) => bone,
-            None => continue,
-        };
-
-        let dst_bone = match dst.get_index(*dst_index) {
-            Some(bone) => bone,
-            None => continue,
-        };
-
-        let quaternion_diff = src_bone.quaternion - dst_bone.quaternion;
-        let translation_diff = src_bone.translation - dst_bone.translation;
-
-        log::info!(
-            "{}:{} || quat {} || trans {}",
-            src_index,
-            dst_index,
-            quaternion_diff,
-            translation_diff,
-        );
-    }
+    // for (dst_index, src_index) in mapping.iter() {
+    //     let src_bone = match src.get_index(*src_index) {
+    //         Some(bone) => bone,
+    //         None => continue,
+    //     };
+    //
+    //     let dst_bone = match dst.get_index(*dst_index) {
+    //         Some(bone) => bone,
+    //         None => continue,
+    //     };
+    //
+    //     // let quaternion_diff = src_bone.quaternion - dst_bone.quaternion;
+    //     // let translation_diff = src_bone.translation - dst_bone.translation;
+    //     //
+    //     // log::info!(
+    //     //     "{}:{} || quat {} || trans {}",
+    //     //     src_index,
+    //     //     dst_index,
+    //     //     quaternion_diff,
+    //     //     translation_diff,
+    //     // );
+    // }
 
     Ok(())
 }

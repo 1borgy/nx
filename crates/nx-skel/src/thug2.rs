@@ -25,8 +25,8 @@ impl Bone {
             name: self.name,
             parent: self.parent,
             flip: self.flip,
-            quaternion: self.quaternion.clone(),
-            translation: self.translation.clone(),
+            quaternion: self.quaternion.into(),
+            translation: self.translation.into(),
         }
     }
 }

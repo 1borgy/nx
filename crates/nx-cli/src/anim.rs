@@ -141,6 +141,8 @@ fn convert_bulk(
     in_game: nx_common::Game,
     out_game: nx_common::Game,
 ) -> color_eyre::Result<()> {
+    println!("test");
+
     let qkeys = nx_stdkey::StdKey::read_file(&qkeys_path, &mut ())?;
     let tkeys = nx_stdkey::StdKey::read_file(&tkeys_path, &mut ())?;
 
@@ -151,6 +153,11 @@ fn convert_bulk(
             Ok(entry) => {
                 let output_path =
                     nx_anim::convert_path(&output_dir.join(entry.file_name()), in_game, out_game)?;
+                println!(
+                    "converting {} to {}",
+                    entry.path().display(),
+                    output_path.display()
+                );
                 let input =
                     nx_anim::Animation::read_file(entry.path(), &mut ())?.to_boned(&qkeys, &tkeys);
                 let converted = nx_anim::convert(&input, in_game, out_game)?;

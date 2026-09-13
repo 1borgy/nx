@@ -4,6 +4,7 @@ version = { workspace = true }
 edition = { workspace = true }
 
 [dependencies]
+nx-bone = { workspace = true }
 nx-common = { workspace = true }
 
 byteorder = { workspace = true }

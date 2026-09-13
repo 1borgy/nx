@@ -9,6 +9,7 @@ path = "src/main.rs"
 
 [dependencies]
 nx-anim = { workspace = true, features = ["serde"] }
+nx-bone = { workspace = true, features = ["serde"] }
 nx-common = { workspace = true, features = ["clap", "serde"] }
 nx-crc = { workspace = true }
 nx-qb = { workspace = true, features = ["serde"] }

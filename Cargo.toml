@@ -10,6 +10,7 @@ license = "MIT"
 
 [workspace.dependencies]
 nx-anim = { path = "crates/nx-anim" }
+nx-bone = { path = "crates/nx-bone" }
 nx-cli = { path = "crates/nx-cli" }
 nx-crc = { path = "crates/nx-crc" }
 nx-common = { path = "crates/nx-common" }

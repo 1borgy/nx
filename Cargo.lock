@@ -476,12 +476,22 @@ dependencies = [
  "bitflags 2.13.1",
  "byteorder",
  "log",
+ "nx-bone",
  "nx-common",
+ "nx-skel",
  "nx-stdkey",
  "nx-test",
  "serde",
  "thiserror",
  "tokio",
+]
+
+[[package]]
+name = "nx-bone"
+version = "0.0.1-dev.1"
+dependencies = [
+ "nx-common",
+ "serde",
 ]
 
 [[package]]
@@ -493,6 +503,7 @@ dependencies = [
  "env_logger",
  "log",
  "nx-anim",
+ "nx-bone",
  "nx-common",
  "nx-crc",
  "nx-qb",
@@ -539,6 +550,7 @@ dependencies = [
  "byteorder",
  "itertools",
  "log",
+ "nx-bone",
  "nx-common",
  "nx-test",
  "serde",

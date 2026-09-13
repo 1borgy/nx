@@ -5,7 +5,7 @@ use nx_common::{Readable, Reader, Writable, Writer};
 use nx_stdkey::StdKey;
 use thiserror::Error;
 
-mod boned;
+pub mod boned;
 mod convert;
 pub mod mapping;
 mod thug2;
@@ -23,8 +23,11 @@ pub enum Error {
     #[error("mapping not implemented: {0} to {1}")]
     MappingNotImplemented(nx_common::Game, nx_common::Game),
 
-    #[error("mapping not implemented: ")]
-    FilenameError(),
+    #[error("unknown error while converting path")]
+    FilenameError,
+
+    #[error("skeleton error: {0}")]
+    SkeletonError(#[from] nx_skel::Error),
 }
 
 impl From<io::Error> for Error {

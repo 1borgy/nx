@@ -4,7 +4,9 @@ version = { workspace = true }
 edition = { workspace = true }
 
 [dependencies]
+nx-bone = { workspace = true }
 nx-common = { workspace = true }
+nx-skel = { workspace = true }
 nx-stdkey = { workspace = true }
 
 bitflags = { workspace = true }
@@ -14,9 +16,10 @@ serde = { workspace = true, optional = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
+nx-bone = { workspace = true }
 nx-test = { workspace = true }
 
 tokio = { workspace = true, features = ["rt", "macros"]}
 
 [features]
-serde = ["dep:serde", "nx-common/serde", "bitflags/serde"]
+serde = ["dep:serde", "nx-bone/serde", "nx-common/serde", "bitflags/serde"]

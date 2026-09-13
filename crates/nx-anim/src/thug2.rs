@@ -3,6 +3,7 @@ use std::io;
 use bitflags::bitflags;
 use byteorder::{LE, ReadBytesExt, WriteBytesExt};
 
+use nx_bone::{Quaternion, Translation};
 use nx_common::{Game, Reader, Writer};
 use nx_stdkey::StdKey;
 
@@ -237,18 +238,18 @@ impl QFrameData {
         }
     }
 
-    fn quaternion(&self, qkeys: &StdKey, flags: QFlags) -> boned::Quaternion {
+    fn quaternion(&self, qkeys: &StdKey, flags: QFlags) -> Quaternion {
         match self {
             Self::Key(index) => {
                 let key = qkeys.get(*index);
-                boned::Quaternion::from_xyz(
+                Quaternion::from_xyz(
                     key.x as f32 / Q_SCALE,
                     key.y as f32 / Q_SCALE,
                     key.z as f32 / Q_SCALE,
                     flags.contains(QFlags::W_SIGN_BIT),
                 )
             }
-            Self::Inline { x, y, z } => boned::Quaternion::from_xyz(
+            Self::Inline { x, y, z } => Quaternion::from_xyz(
                 x.coordinate() / Q_SCALE,
                 y.coordinate() / Q_SCALE,
                 z.coordinate() / Q_SCALE,
@@ -257,7 +258,7 @@ impl QFrameData {
         }
     }
 
-    fn from_quaternion(quaternion: &boned::Quaternion) -> Self {
+    fn from_quaternion(quaternion: &Quaternion) -> Self {
         Self::Inline {
             x: QCoord::I16((quaternion.x() * Q_SCALE) as i16),
             y: QCoord::I16((quaternion.y() * Q_SCALE) as i16),
@@ -503,17 +504,17 @@ impl TFrameData {
         }
     }
 
-    fn translation(&self, tkeys: &StdKey) -> boned::Translation {
+    fn translation(&self, tkeys: &StdKey) -> Translation {
         match self {
             Self::Key(index) => {
                 let key = tkeys.get(*index);
-                boned::Translation {
+                Translation {
                     x: key.x as f32 / T_SCALE,
                     y: key.y as f32 / T_SCALE,
                     z: key.z as f32 / T_SCALE,
                 }
             }
-            Self::Inline { x, y, z } => boned::Translation {
+            Self::Inline { x, y, z } => Translation {
                 x: *x as f32 / T_SCALE,
                 y: *y as f32 / T_SCALE,
                 z: *z as f32 / T_SCALE,
@@ -521,7 +522,7 @@ impl TFrameData {
         }
     }
 
-    fn from_translation(translation: &boned::Translation) -> Self {
+    fn from_translation(translation: &Translation) -> Self {
         Self::Inline {
             x: (translation.x * T_SCALE) as i16,
             y: (translation.y * T_SCALE) as i16,
@@ -790,7 +791,7 @@ impl Animation {
         boned::Animation {
             duration: self.header.duration,
             bones: (0..self.header.num_bones)
-                .map(|bone_index| boned::Bone {
+                .map(|bone_index| boned::AnimBone {
                     q_frames: self
                         .q_blocks
                         .get(bone_index as usize)

@@ -1,0 +1,12 @@
+[package]
+name = "nx-bone"
+version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
+nx-common = { workspace = true, optional = true }
+
+serde = { workspace = true, optional = true }
+
+[features]
+serde = ["dep:serde", "nx-common/serde"]

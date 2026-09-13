@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 
 use clap::Parser;
+use nx_bone::{Quaternion, Translation};
 
 mod anim;
 mod common;
@@ -52,7 +53,8 @@ fn main() -> color_eyre::Result<()> {
         Command::StdKey { command } => stdkey::main(command),
         Command::Qb { command } => qb::main(command),
         Command::Test => {
-            println!("{:08x}", 872384015);
+            nx_anim::mapping::thug_to_thps4_test()?;
+            // println!("trans={:?} rot={:?} rotated={:?}", trans, rot, rotated);
             Ok(())
         }
         Command::Crc { command } => crc::main(command),
