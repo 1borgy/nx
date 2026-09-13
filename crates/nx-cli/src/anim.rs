@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{fs, path::PathBuf};
 
 use nx_anim::WriteContext;
 use nx_common::{Game, Readable, Writable};
@@ -49,6 +49,25 @@ pub enum Command {
 
         #[arg(short, long)]
         output: PathBuf,
+
+        #[arg(short, long)]
+        qkeys: PathBuf,
+
+        #[arg(short, long)]
+        tkeys: PathBuf,
+
+        #[arg(long)]
+        in_game: nx_common::Game,
+
+        #[arg(long)]
+        out_game: nx_common::Game,
+    },
+    ConvertBulk {
+        #[arg(short, long)]
+        input_dir: PathBuf,
+
+        #[arg(short, long)]
+        output_dir: PathBuf,
 
         #[arg(short, long)]
         qkeys: PathBuf,
@@ -114,6 +133,39 @@ fn convert(
     Ok(())
 }
 
+fn convert_bulk(
+    input_dir: PathBuf,
+    output_dir: PathBuf,
+    qkeys_path: PathBuf,
+    tkeys_path: PathBuf,
+    in_game: nx_common::Game,
+    out_game: nx_common::Game,
+) -> color_eyre::Result<()> {
+    let qkeys = nx_stdkey::StdKey::read_file(&qkeys_path, &mut ())?;
+    let tkeys = nx_stdkey::StdKey::read_file(&tkeys_path, &mut ())?;
+
+    fs::create_dir_all(&output_dir)?;
+
+    for entry in input_dir.read_dir()? {
+        match entry {
+            Ok(entry) => {
+                let output_path =
+                    nx_anim::convert_path(&output_dir.join(entry.file_name()), in_game, out_game)?;
+                let input =
+                    nx_anim::Animation::read_file(entry.path(), &mut ())?.to_boned(&qkeys, &tkeys);
+                let converted = nx_anim::convert(&input, in_game, out_game)?;
+                nx_anim::Animation::from_boned(&converted, out_game)
+                    .write_file(&output_path, &mut WriteContext { game: out_game })?;
+            }
+            Err(err) => {
+                log::error!("error converting anim: {}", err)
+            }
+        }
+    }
+
+    Ok(())
+}
+
 pub fn main(command: Command) -> color_eyre::Result<()> {
     match command {
         Command::RoundTrip {
@@ -146,5 +198,13 @@ pub fn main(command: Command) -> color_eyre::Result<()> {
             in_game,
             out_game,
         } => convert(input, output, qkeys, tkeys, in_game, out_game),
+        Command::ConvertBulk {
+            input_dir,
+            output_dir,
+            qkeys,
+            tkeys,
+            in_game,
+            out_game,
+        } => convert_bulk(input_dir, output_dir, qkeys, tkeys, in_game, out_game),
     }
 }

@@ -10,7 +10,7 @@ mod convert;
 pub mod mapping;
 mod thug2;
 
-pub use convert::convert;
+pub use convert::{convert, convert_path};
 
 #[derive(Debug, Error)]
 pub enum Error {
@@ -22,6 +22,9 @@ pub enum Error {
 
     #[error("mapping not implemented: {0} to {1}")]
     MappingNotImplemented(nx_common::Game, nx_common::Game),
+
+    #[error("mapping not implemented: ")]
+    FilenameError(),
 }
 
 impl From<io::Error> for Error {

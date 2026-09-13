@@ -370,11 +370,17 @@ impl QFrame {
     }
 
     fn from_boned(frame: &boned::QFrame) -> Self {
+        let sign_bit = if frame.quaternion.w() < 0.0 {
+            QFlags::W_SIGN_BIT
+        } else {
+            QFlags::empty()
+        };
+
         Self {
             // time: Some(frame.time),
             // flags: QFlags::empty(),
             time: None,
-            flags: QFlags::from_bits_retain(frame.time),
+            flags: QFlags::from_bits_retain(frame.time) | sign_bit,
             data: QFrameData::from_quaternion(&frame.quaternion),
         }
     }
