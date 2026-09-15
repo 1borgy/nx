@@ -101,6 +101,15 @@ impl Translation {
         (self.x.powi(2) + self.y.powi(2) + self.z.powi(2)).sqrt()
     }
 
+    pub fn angles(&self) -> (f32, f32, f32) {
+        let mag = self.magnitude();
+        (
+            (self.x / mag).acos(),
+            (self.y / mag).acos(),
+            (self.z / mag).acos(),
+        )
+    }
+
     pub fn dot(&self, other: &Translation) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }

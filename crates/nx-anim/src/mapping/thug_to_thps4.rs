@@ -16,7 +16,18 @@ pub fn thug_to_thps4_test() -> Result<(), nx_skel::Error> {
     let thug_skel = Skeleton::read(&mut io::Cursor::new(THUG_SKEL_BYTES), &mut ())?.to_boned()?;
 
     for (i, bone) in thps4_skel.bones.iter().enumerate() {
-        log::info!("bone_{}.magnitude={}", i, bone.translation.magnitude());
+        let mag = bone.translation.magnitude();
+        let (tx, ty, tz) = bone.translation.angles();
+        let r2d = 57.29578;
+        let (dx, dy, dz) = (tx * r2d, ty * r2d, tz * r2d);
+        log::info!(
+            "bone_{} magnitude={} angles=({}, {}, {})",
+            i,
+            mag,
+            dx,
+            dy,
+            dz
+        );
     }
 
     for (i, bone) in thug_skel.bones.iter().enumerate() {

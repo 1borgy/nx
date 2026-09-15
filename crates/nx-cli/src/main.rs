@@ -54,7 +54,6 @@ fn main() -> color_eyre::Result<()> {
         Command::Qb { command } => qb::main(command),
         Command::Test => {
             nx_anim::mapping::thug_to_thps4_test()?;
-            // println!("trans={:?} rot={:?} rotated={:?}", trans, rot, rotated);
             Ok(())
         }
         Command::Crc { command } => crc::main(command),
