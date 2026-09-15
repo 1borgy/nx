@@ -6,6 +6,7 @@ edition = { workspace = true }
 [dependencies]
 nx-common = { workspace = true, optional = true }
 
+quaternion-core = { workspace = true }
 serde = { workspace = true, optional = true }
 
 [features]

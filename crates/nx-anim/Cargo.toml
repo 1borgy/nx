@@ -12,6 +12,7 @@ nx-stdkey = { workspace = true }
 bitflags = { workspace = true }
 byteorder = { workspace = true }
 log = { workspace = true }
+quaternion-core = { workspace = true }
 serde = { workspace = true, optional = true }
 thiserror = { workspace = true }
 

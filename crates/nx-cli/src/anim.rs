@@ -93,8 +93,8 @@ fn decompress_anim(
     let qkeys = nx_stdkey::StdKey::read_file(&qkeys_path, &mut ())?;
     let tkeys = nx_stdkey::StdKey::read_file(&tkeys_path, &mut ())?;
 
-    let boned = nx_anim::Animation::read_file(&input_path, &mut ())?.to_boned(&qkeys, &tkeys);
-    nx_anim::Animation::from_boned(&boned, out_game)
+    nx_anim::Animation::read_file(&input_path, &mut ())?
+        .decompress(&qkeys, &tkeys)
         .write_file(&output_path, &mut nx_anim::WriteContext { game: out_game })?;
 
     Ok(())
@@ -141,8 +141,6 @@ fn convert_bulk(
     in_game: nx_common::Game,
     out_game: nx_common::Game,
 ) -> color_eyre::Result<()> {
-    println!("test");
-
     let qkeys = nx_stdkey::StdKey::read_file(&qkeys_path, &mut ())?;
     let tkeys = nx_stdkey::StdKey::read_file(&tkeys_path, &mut ())?;
 

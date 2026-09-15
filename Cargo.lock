@@ -470,6 +470,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "743fb55ba31b18fb1ecef6bdc9aa2743314978ac084044301a7eee33fb99a20d"
 
 [[package]]
+name = "num-traits"
+version = "0.2.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841"
+dependencies = [
+ "autocfg",
+]
+
+[[package]]
 name = "nx-anim"
 version = "0.0.1-dev.1"
 dependencies = [
@@ -481,6 +490,7 @@ dependencies = [
  "nx-skel",
  "nx-stdkey",
  "nx-test",
+ "quaternion-core",
  "serde",
  "thiserror",
  "tokio",
@@ -491,6 +501,7 @@ name = "nx-bone"
 version = "0.0.1-dev.1"
 dependencies = [
  "nx-common",
+ "quaternion-core",
  "serde",
 ]
 
@@ -729,6 +740,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "quaternion-core"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "747b36ed9e86b6a952448832f218833bc364a7286834be36ca122eb122b3f158"
+dependencies = [
+ "num-traits",
 ]
 
 [[package]]

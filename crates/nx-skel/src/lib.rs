@@ -8,6 +8,8 @@ mod boned;
 mod thps4;
 mod thug2;
 
+pub use boned::Bone;
+
 pub const THAW_HEADER_VERSION: u16 = 1;
 
 #[derive(Debug, Error)]

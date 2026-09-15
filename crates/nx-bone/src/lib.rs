@@ -1,4 +1,5 @@
 use nx_common::Vec4;
+use quaternion_core as quat;
 use std::{fmt, ops};
 
 #[derive(Debug, Copy, Clone)]
@@ -23,6 +24,30 @@ impl Quaternion {
         let sign = if sign_bit { -1 } else { 1 };
         let w = (1.0 - x.powi(2) - y.powi(2) - z.powi(2)).sqrt() * (sign as f32);
         Self::new(x, y, z, w)
+    }
+
+    pub fn to_angles(&self) -> (f32, f32, f32) {
+        let [tx, ty, tz] = quat::to_euler_angles(
+            quat::RotationType::Intrinsic,
+            quat::RotationSequence::XYZ,
+            (self.w, [self.x, self.y, self.z]),
+        );
+        (tx, ty, tz)
+    }
+
+    pub fn from_angles(x: f32, y: f32, z: f32) -> Self {
+        let (w, [xp, yp, zp]) = quat::from_euler_angles(
+            quat::RotationType::Intrinsic,
+            quat::RotationSequence::XYZ,
+            [x, y, z],
+        );
+
+        Self {
+            x: xp,
+            y: yp,
+            z: zp,
+            w,
+        }
     }
 
     pub fn x(&self) -> f32 {
@@ -97,11 +122,19 @@ impl Translation {
         }
     }
 
+    pub fn from_angles(tx: f32, ty: f32, tz: f32, mag: f32) -> Self {
+        Self {
+            x: tx.cos() * mag,
+            y: ty.cos() * mag,
+            z: tz.cos() * mag,
+        }
+    }
+
     pub fn magnitude(&self) -> f32 {
         (self.x.powi(2) + self.y.powi(2) + self.z.powi(2)).sqrt()
     }
 
-    pub fn angles(&self) -> (f32, f32, f32) {
+    pub fn to_angles(&self) -> (f32, f32, f32) {
         let mag = self.magnitude();
         (
             (self.x / mag).acos(),
