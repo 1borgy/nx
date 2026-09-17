@@ -1,7 +1,4 @@
-use crate::{
-    Qb,
-    qb::{parser::Error::UnexpectedToken, token::Token},
-};
+use crate::{Qb, parser::Error::UnexpectedToken, token::Token};
 
 #[derive(thiserror::Error, Debug, Clone)]
 pub enum Error {
@@ -27,6 +24,7 @@ pub enum Node {
     Global(String),
     Symbol(String),
     Assignment(Box<Node>, Box<Node>),
+    Newline,
     Token(Token), // A simple token that isn't a larger block construct
 }
 
@@ -39,7 +37,10 @@ impl Node {
             let (node, new_pos) = Self::parse_any(qb, pos)?;
             pos = new_pos;
             match node {
-                Self::Token(Token::Newline) | Self::Token(Token::NewlineDebug(_)) => (),
+                Self::Token(Token::SymbolDef(_, _))
+                // | Self::Token(Token::Newline)
+                // | Self::Token(Token::NewlineDebug(_))
+                => (),
                 _ => nodes.push(node),
             }
         }
@@ -67,7 +68,7 @@ impl Node {
             let (node, new_pos) = Self::parse_any(qb, *pos)?;
             *pos = new_pos;
             match node {
-                Self::Token(Token::Newline) | Self::Token(Token::NewlineDebug(_)) => (),
+                // Self::Token(Token::Newline) | Self::Token(Token::NewlineDebug(_)) => (),
                 _ => nodes.push(node),
             }
         }

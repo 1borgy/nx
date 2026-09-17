@@ -1,8 +1,10 @@
+use std::io;
+
 use byteorder::{LE, ReadBytesExt, WriteBytesExt};
 use encoding_rs::WINDOWS_1252;
 use nx_common::Reader;
 
-use crate::{Error, qb::symbols::SymbolTable};
+use crate::{Error, symbols::SymbolTable};
 
 #[derive(Debug, Clone)]
 #[allow(unused)]
@@ -280,7 +282,7 @@ impl Token {
     fn write_varlen_string(
         writer: &mut impl nx_common::Writer,
         bytes: &Vec<u8>,
-    ) -> Result<(), Error> {
+    ) -> Result<(), io::Error> {
         for byte in bytes.iter() {
             writer.write_u8(*byte)?;
         }
@@ -293,7 +295,7 @@ impl Token {
     fn write_fixed_string(
         writer: &mut impl nx_common::Writer,
         bytes: &Vec<u8>,
-    ) -> Result<(), Error> {
+    ) -> Result<(), io::Error> {
         let len = (bytes.len() + 1) as i32;
         writer.write_i32::<LE>(len)?;
 
@@ -310,7 +312,7 @@ impl Token {
         writer: &mut impl nx_common::Writer,
         count: u32,
         offsets: &Vec<u32>,
-    ) -> Result<(), Error> {
+    ) -> Result<(), io::Error> {
         writer.write_u32::<LE>(count)?;
 
         for offset in offsets.iter() {
@@ -320,7 +322,7 @@ impl Token {
         Ok(())
     }
 
-    pub fn write(&self, writer: &mut impl nx_common::Writer) -> Result<(), Error> {
+    pub fn write(&self, writer: &mut impl nx_common::Writer) -> Result<(), io::Error> {
         match self {
             Self::Terminator => writer.write_u8(0x0)?,
             Self::Newline => writer.write_u8(0x1)?,
