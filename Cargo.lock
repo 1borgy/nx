@@ -491,6 +491,7 @@ dependencies = [
  "nx-stdkey",
  "nx-test",
  "quaternion-core",
+ "ron",
  "serde",
  "thiserror",
  "tokio",

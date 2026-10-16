@@ -4,7 +4,7 @@ use byteorder::{LE, ReadBytesExt};
 use nx_common::{Readable, Reader, Writable, Writer};
 use thiserror::Error;
 
-mod boned;
+pub mod boned;
 mod thps4;
 mod thug2;
 

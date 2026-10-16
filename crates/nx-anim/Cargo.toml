@@ -13,7 +13,8 @@ bitflags = { workspace = true }
 byteorder = { workspace = true }
 log = { workspace = true }
 quaternion-core = { workspace = true }
-serde = { workspace = true, optional = true }
+serde = { workspace = true }
+ron = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
@@ -23,4 +24,4 @@ nx-test = { workspace = true }
 tokio = { workspace = true, features = ["rt", "macros"]}
 
 [features]
-serde = ["dep:serde", "nx-bone/serde", "nx-common/serde", "bitflags/serde"]
+serde = ["nx-bone/serde", "nx-common/serde", "bitflags/serde"]
