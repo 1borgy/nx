@@ -61,6 +61,9 @@ pub enum Command {
 
         #[arg(long)]
         out_game: nx_common::Game,
+
+        #[clap(flatten)]
+        settle: SettleArgs,
     },
     ConvertBulk {
         #[arg(short, long)]
@@ -80,7 +83,76 @@ pub enum Command {
 
         #[arg(long)]
         out_game: nx_common::Game,
+
+        #[clap(flatten)]
+        settle: SettleArgs,
     },
+}
+
+/// Settling a converted animation tail onto the pose it is cut into.
+///
+/// Optional: without `--exits` the conversion is unchanged, which is also what any animation
+/// with no declared exit gets.
+#[derive(Debug, Clone, clap::Args)]
+pub struct SettleArgs {
+    /// RON manifest of exits, keyed by the bare animation name. See nx_anim::mapping::exits.
+    #[arg(long)]
+    exits: Option<PathBuf>,
+
+    /// Directory of THPS4 animations to take exit poses from, named as the game ships them
+    /// (for example `Idleska.dat`).
+    #[arg(long)]
+    target_anims: Option<PathBuf>,
+
+    /// Standard keys for reading those target animations: THPS4 ones, not the source game.
+    #[arg(long)]
+    target_qkeys: Option<PathBuf>,
+
+    #[arg(long)]
+    target_tkeys: Option<PathBuf>,
+
+    /// Override every manifest entry blend length, for trying a different ease.
+    #[arg(long)]
+    blend_frames: Option<u16>,
+}
+
+struct Settle {
+    exits: nx_anim::Exits,
+    ctx: nx_anim::SettleContext,
+    blend_frames: Option<u16>,
+}
+
+impl Settle {
+    fn load(args: &SettleArgs) -> color_eyre::Result<Option<Self>> {
+        let Some(exits_path) = &args.exits else {
+            return Ok(None);
+        };
+
+        let missing = |what: &str| {
+            color_eyre::eyre::eyre!("--exits also needs --target-{what} to read exit poses")
+        };
+
+        let anims = args.target_anims.as_ref().ok_or_else(|| missing("anims"))?;
+        let qkeys = args.target_qkeys.as_ref().ok_or_else(|| missing("qkeys"))?;
+        let tkeys = args.target_tkeys.as_ref().ok_or_else(|| missing("tkeys"))?;
+
+        Ok(Some(Self {
+            exits: nx_anim::mapping::exits::read_file(exits_path)?,
+            ctx: nx_anim::SettleContext::new(anims, qkeys, tkeys)?,
+            blend_frames: args.blend_frames,
+        }))
+    }
+
+    /// The exit for `name`, with any --blend-frames override applied.
+    fn spec(&self, name: &str) -> Option<nx_anim::ExitSpec> {
+        self.exits.get(name).map(|spec| match self.blend_frames {
+            Some(frames) => nx_anim::ExitSpec {
+                blend_frames: Some(frames),
+                ..spec.clone()
+            },
+            None => spec.clone(),
+        })
+    }
 }
 
 fn decompress_anim(
@@ -121,12 +193,22 @@ fn convert(
     tkeys_path: PathBuf,
     in_game: nx_common::Game,
     out_game: nx_common::Game,
+    settle_args: SettleArgs,
 ) -> color_eyre::Result<()> {
     let qkeys = nx_stdkey::StdKey::read_file(&qkeys_path, &mut ())?;
     let tkeys = nx_stdkey::StdKey::read_file(&tkeys_path, &mut ())?;
+    let settle = Settle::load(&settle_args)?;
 
+    let name = nx_anim::anim_name(&input_path).unwrap_or_default();
     let input = nx_anim::Animation::read_file(&input_path, &mut ())?.to_boned(&qkeys, &tkeys);
-    let converted = nx_anim::convert(&input, in_game, out_game)?;
+    let spec = settle.as_ref().and_then(|s| s.spec(&name));
+    let converted = nx_anim::convert(
+        &input,
+        in_game,
+        out_game,
+        &name,
+        spec.as_ref().zip(settle.as_ref().map(|s| &s.ctx)),
+    )?;
     nx_anim::Animation::from_boned(&converted, out_game)
         .write_file(&output_path, &mut WriteContext { game: out_game })?;
 
@@ -140,9 +222,11 @@ fn convert_bulk(
     tkeys_path: PathBuf,
     in_game: nx_common::Game,
     out_game: nx_common::Game,
+    settle_args: SettleArgs,
 ) -> color_eyre::Result<()> {
     let qkeys = nx_stdkey::StdKey::read_file(&qkeys_path, &mut ())?;
     let tkeys = nx_stdkey::StdKey::read_file(&tkeys_path, &mut ())?;
+    let settle = Settle::load(&settle_args)?;
 
     fs::create_dir_all(&output_dir)?;
 
@@ -156,9 +240,17 @@ fn convert_bulk(
                     entry.path().display(),
                     output_path.display()
                 );
+                let name = nx_anim::anim_name(&entry.path()).unwrap_or_default();
                 let input =
                     nx_anim::Animation::read_file(entry.path(), &mut ())?.to_boned(&qkeys, &tkeys);
-                let converted = nx_anim::convert(&input, in_game, out_game)?;
+                let spec = settle.as_ref().and_then(|s| s.spec(&name));
+                let converted = nx_anim::convert(
+                    &input,
+                    in_game,
+                    out_game,
+                    &name,
+                    spec.as_ref().zip(settle.as_ref().map(|s| &s.ctx)),
+                )?;
                 nx_anim::Animation::from_boned(&converted, out_game)
                     .write_file(&output_path, &mut WriteContext { game: out_game })?;
             }
@@ -202,7 +294,8 @@ pub fn main(command: Command) -> color_eyre::Result<()> {
             tkeys,
             in_game,
             out_game,
-        } => convert(input, output, qkeys, tkeys, in_game, out_game),
+            settle,
+        } => convert(input, output, qkeys, tkeys, in_game, out_game, settle),
         Command::ConvertBulk {
             input_dir,
             output_dir,
@@ -210,6 +303,9 @@ pub fn main(command: Command) -> color_eyre::Result<()> {
             tkeys,
             in_game,
             out_game,
-        } => convert_bulk(input_dir, output_dir, qkeys, tkeys, in_game, out_game),
+            settle,
+        } => convert_bulk(
+            input_dir, output_dir, qkeys, tkeys, in_game, out_game, settle,
+        ),
     }
 }

@@ -65,6 +65,27 @@ impl Quaternion {
     pub fn w(&self) -> f32 {
         self.w
     }
+
+    /// Conjugate, which is also the inverse for the unit quaternions used here.
+    pub fn conjugate(&self) -> Self {
+        Self::new(-self.x, -self.y, -self.z, self.w)
+    }
+
+    /// Normalized linear interpolation along the shortest arc.
+    pub fn nlerp(&self, other: &Self, alpha: f32) -> Self {
+        let dot = self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w;
+        let sign = if dot < 0.0 { -1.0 } else { 1.0 };
+
+        let x = self.x + (other.x * sign - self.x) * alpha;
+        let y = self.y + (other.y * sign - self.y) * alpha;
+        let z = self.z + (other.z * sign - self.z) * alpha;
+        let w = self.w + (other.w * sign - self.w) * alpha;
+
+        match (x * x + y * y + z * z + w * w).sqrt() {
+            0.0 => *self,
+            len => Self::new(x / len, y / len, z / len, w / len),
+        }
+    }
 }
 
 impl ops::Mul for Quaternion {

@@ -1,6 +1,6 @@
 use std::io;
 
-use nx_bone::Quaternion;
+use nx_bone::{Quaternion, Translation};
 use nx_common::Readable;
 use nx_skel::Skeleton;
 use quaternion_core as quat;
@@ -47,26 +47,43 @@ pub fn thug_to_thps4(thug: &Animation) -> Result<Animation, nx_skel::Error> {
     let thps4_skel = Skeleton::read(&mut io::Cursor::new(THPS4_SKEL_BYTES), &mut ())?.to_boned()?;
     let thug_skel = Skeleton::read(&mut io::Cursor::new(THUG_SKEL_BYTES), &mut ())?.to_boned()?;
 
+    // The two games store the skater's height on different bones, THPS4 on the root, THUG on
+    // the hip below it. Copying both across looks fine, since the total is the same, but it
+    // leaves THPS4's root at zero and hides a real difference in where the board sits.
+    //
+    // So the height goes back on the root and comes off the hips and the board. The amount is
+    // the root's own height, not the gap between the two skeletons at rest, neither game rests
+    // in a standing-on-a-board pose.
+    let root = thps4_skel.bone(0).translation;
+    let unroot = Translation::new(0.0, 0.0, -root.y);
+
     Ok(Animation {
         duration: thug.duration,
         // thps4 <- thug
         bones: vec![
             // 0 (dummy_scale_zz) <- 0 (Control_Root)
-            thug.bone(0),
-            // .translate(thps4_skel.bone(0).translation - thug_skel.bone(0).translation),
+            thug.bone(0).translate(root - thug_skel.bone(0).translation),
             // 1 (pelvis) <- 1 (Bone_Pelvis)
-            thug.bone(1),
-            // .translate(thps4_skel.bone(1).translation - thug_skel.bone(1).translation)
-            // .translate(Translation::new(0.0, 0.0, -2.0)),
-            // 2 (stomach) <- 2 (Bone_Stomach_Lower)
-            thug.bone(2).baseline(thug_skel.bone(2), thps4_skel.bone(2)),
+            thug.bone(1).translate(unroot),
+            // 2 (stomach) <- 2 (Bone_Stomach_Lower) * 3 (Bone_Stomach_Upper)
+            // THPS4 has a single stomach bone where THUG has Stomach_Lower -> Stomach_Upper,
+            // and THPS4's `chest` lines up with THUG's `Chest`
+            // so Upper has to be folded into the stomach rather than dropped.
+            thug.bone(2)
+                .compose_child(&thug.bone(3))
+                .baseline(thug_skel.bone(2), thps4_skel.bone(2)),
             // 3 (chest) <- 4 (Bone_Chest)
             thug.bone(4).baseline(thug_skel.bone(4), thps4_skel.bone(3)),
             // 4 (neck) <- 29 (Bone_Neck)
+            //
+            // Neck and head are the two bones whose rest orientation differs enough between
+            // the rigs to matter.
             thug.bone(29)
+                .rebase_rotations(thug_skel.bone(29), thps4_skel.bone(4))
                 .baseline(thug_skel.bone(29), thps4_skel.bone(4)),
             // 5 (head) <- 30 (Bone_Head)
             thug.bone(30)
+                .rebase_rotations(thug_skel.bone(30), thps4_skel.bone(5))
                 .baseline(thug_skel.bone(30), thps4_skel.bone(5)),
             // 6 (mullet_cloth_zz)
             AnimBone::static_bone(thps4_skel.bone(6)),
@@ -179,8 +196,12 @@ pub fn thug_to_thps4(thug: &Animation) -> Result<Animation, nx_skel::Error> {
             // 46 (left_low_trouser_cloth_zz)
             AnimBone::static_bone(thps4_skel.bone(46)),
             // 47 (burnq_board) <- 50 (Bone_Board_Root)
-            thug.bone(50),
-            // .translate(thps4_skel.bone(47).translation - thug_skel.bone(50).translation),
+            //
+            // THUG's board bone rests lower than THPS4's. Without this, every converted anim
+            // rides 0.76 low and the board pops back up the moment a stock THPS4 anim
+            // takes over.
+            thug.bone(50)
+                .translate(thps4_skel.bone(47).translation - thug_skel.bone(50).translation),
             // 48 (burnq_front_wheel) <- 51 (Bone_Board_Nose)
             AnimBone::static_bone(thps4_skel.bone(48)),
             // thug.bone(51)

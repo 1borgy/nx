@@ -10,7 +10,8 @@ mod convert;
 pub mod mapping;
 mod thug2;
 
-pub use convert::{convert, convert_path};
+pub use convert::{anim_name, convert, convert_path};
+pub use mapping::{Exit, ExitSpec, Exits, SettleContext};
 
 #[derive(Debug, Error)]
 pub enum Error {
@@ -28,6 +29,9 @@ pub enum Error {
 
     #[error("skeleton error: {0}")]
     SkeletonError(#[from] nx_skel::Error),
+
+    #[error("exit error: {0}")]
+    Exit(#[from] mapping::exits::Error),
 }
 
 impl From<io::Error> for Error {
